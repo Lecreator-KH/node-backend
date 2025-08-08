@@ -1,7 +1,9 @@
 const express = require('express');
 const { Pool } = require('pg'); // Import the Pool class
+
 const app = express();
 const port = 3000;
+
 // Configure the database connection pool
 const pool = new Pool({
     user: 'postgres', // Your PostgreSQL username
@@ -10,6 +12,7 @@ const pool = new Pool({
     password: 123, // Your PostgreSQL password
     port: 5432,
 });
+
 app.use(express.json());
 
 app.get('/', (req, res) => {

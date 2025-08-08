@@ -1,32 +1,26 @@
 const request = require('supertest');
 const app = require('./app'); // Your Express app
 const { Pool } = require('pg');
-// Create a pool for testing.
-// In a real-world scenario, you might use a separate test database.
+// This pool will use environment variables in CI
+// and fallback to defaults for local testing.
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'restaurants_db',
-    password: 'your_password',
-    port: 5432,
+    user: process.env.PG_USER || 'postgres',
+    host: process.env.PG_HOST || 'localhost',
+    database: process.env.PG_DATABASE || 'restaurants_db',
+    password: process.env.PG_PASSWORD || '123',
+    port: parseInt(process.env.PG_PORT || '5432'),
 });
-// Jest hooks to manage the test lifecycle
 beforeAll(() => {
-    // This runs once before all tests
+    // Optional: any one-time setup
 });
 afterAll(async () => {
-    // This runs once after all tests have finished
-    // We close the database connection to allow Jest to exit gracefully.
     await pool.end();
 });
 beforeEach(async () => {
-    // This runs before each individual test
-    // We clean the table and seed it with known data for a predictable state.
     await pool.query('TRUNCATE TABLE restaurants RESTART IDENTITY');
     await pool.query(
-        `INSERT INTO restaurants (name, cuisine, rating) VALUES
-('Testaurant', 'Test Cuisine', 4.0),
-('Another Test Place', 'Test Food', 3.5)`
+        `INSERT INTO restaurants (name, cuisine, rating)
+VALUES ('Testaurant', 'Test Cuisine', 4.0)`
     );
 });
 // Main test suite
