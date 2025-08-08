@@ -100,6 +100,13 @@ app.put('/restaurants/:id', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+// At the bottom of app.js
+
+// Only start the server if the file is run directly
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
+}
+// Export the app for testing
+module.exports = app;
