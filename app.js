@@ -9,7 +9,7 @@ const pool = new Pool({
     user: 'postgres', // Your PostgreSQL username
     host: 'localhost',
     database: 'restaurants_db', // The database you created
-    password: 123, // Your PostgreSQL password
+    password: '123', // Your PostgreSQL password
     port: 5432,
 });
 
@@ -102,8 +102,6 @@ app.put('/restaurants/:id', async (req, res) => {
         res.status(500).json({ error: "An internal server error occurred" });
     }
 });
-
-// At the bottom of app.js
 
 // Only start the server if the file is run directly
 if (process.env.NODE_ENV !== 'test') {

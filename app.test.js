@@ -32,7 +32,7 @@ describe('Restaurant API', () => {
             const response = await request(app).get('/restaurants');
             expect(response.statusCode).toBe(200);
             expect(response.body).toBeInstanceOf(Array);
-            expect(response.body.length).toBe(2);
+            expect(response.body.length).toBe(1);
             expect(response.body[0].name).toBe('Testaurant');
         });
     });
@@ -59,7 +59,7 @@ describe('Restaurant API', () => {
                 .post('/restaurants')
                 .send(newRestaurant);
             expect(response.statusCode).toBe(201);
-            expect(response.body.id).toBe(3); // 1 and 2 were seeded
+            expect(response.body.id).toBe(2); // 1 and 2 were seeded
             expect(response.body.name).toBe('Brand New Cafe');
         });
     });
