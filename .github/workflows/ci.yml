@@ -37,11 +37,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create database and table
+        run: |
+          psql -h localhost -U postgres -d postgres -c "CREATE DATABASE restaurant_db;"
+          psql -h localhost -U postgres -d restaurant_db -c "
+            CREATE TABLE IF NOT EXISTS restaurants (
+              id SERIAL PRIMARY KEY,
+              name VARCHAR(100) NOT NULL,
+              cuisine VARCHAR(50),
+              rating DECIMAL(2, 1)
+            );
+          "
+        env:
+          PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
       - name: Run tests
         run: npm test
         env:
           PG_HOST: localhost
           PG_USER: postgres
           PG_PORT: 5432
-          PG_DATABASE: restaurants_db
+          PG_DATABASE: restaurant_db
           PG_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
