@@ -4,6 +4,13 @@ const { Pool } = require('pg'); // Import the Pool class
 const app = express();
 const port = 3000;
 
+// Set up rate limiter: Max 100 requests per 15 min per IP
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+});
+
 // Configure the database connection pool
 const pool = new Pool({
     user: 'postgres', // Your PostgreSQL username
@@ -23,7 +30,7 @@ app.get('/about', (req, res) => {
     res.send('This API is created by Kevin!');
 });
 
-app.get('/restaurants', async (req, res) => {
+app.get('/restaurants', limiter, async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM restaurants ORDER BY id ASC');
         res.json(result.rows);
@@ -33,7 +40,7 @@ app.get('/restaurants', async (req, res) => {
     }
 });
 
-app.get('/restaurants/:id', async (req, res) => {
+app.get('/restaurants/:id', limiter, async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('SELECT * FROM restaurants WHERE id = $1', [id]);
@@ -47,7 +54,7 @@ app.get('/restaurants/:id', async (req, res) => {
     }
 });
 
-app.post('/restaurants', async (req, res) => {
+app.post('/restaurants', limiter, async (req, res) => {
     const { name, cuisine, rating } = req.body;
     if (!name || !cuisine || typeof rating !== 'number') {
         return res.status(400).json({ error: "name, cuisine, and numeric rating are required" });
@@ -64,7 +71,7 @@ app.post('/restaurants', async (req, res) => {
     }
 });
 
-app.delete('/restaurants/:id', async (req, res) => {
+app.delete('/restaurants/:id', limiter, async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('DELETE FROM restaurants WHERE id = $1 RETURNING *',
@@ -80,7 +87,7 @@ app.delete('/restaurants/:id', async (req, res) => {
     }
 });
 
-app.put('/restaurants/:id', async (req, res) => {
+app.put('/restaurants/:id', limiter, async (req, res) => {
     const { id } = req.params;
     const { name, cuisine, rating } = req.body;
     // For simplicity, this example requires all fields. A more robust solution
